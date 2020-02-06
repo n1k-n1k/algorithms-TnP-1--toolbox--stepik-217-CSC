@@ -7,16 +7,13 @@
 
 
 def gcd(a, b):
-    while a != 0 and b != 0:
+    while a and b:
         if a >= b:
-            a, b = a % b, b
+            a %= b
         else:
-            a, b = a, b % a
+            b %= a
 
-    if a == 0:
-        return b
-    elif b == 0:
-        return a
+    return max(a, b)
 
 
 def main():
