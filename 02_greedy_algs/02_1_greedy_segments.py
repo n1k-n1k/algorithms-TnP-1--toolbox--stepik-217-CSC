@@ -22,17 +22,16 @@
 и будет решением.
 '''
 
+# v2. рефакторинг: оптимизация сложности алгоритма
 
 n = int(input())
 segs = [list(map(int, input().split())) for i in range(n)]
 segs.sort(key=lambda seg: seg[1])
-dots = tuple()
+dots = [segs[0][1]]
 
-while segs != []:
-    dot = segs.pop(0)[1]
-    while segs != [] and segs[0][0] <= dot <= segs[0][1]:
-        segs.pop(0)
-    dots += (dot,)
+for start, stop in segs[1:]:
+    if start > dots[-1]:
+        dots.append(stop)
 
 print(len(dots))
 print(*dots, sep=' ')
