@@ -15,16 +15,13 @@ def greedy_list(n):
         curr = 1
         sum_ = 1
         while sum_ < n:
-            prev = curr
-            curr = prev + 1
-            curr_max = 2 * (prev + 1)
-            curr_last = n - sum_
-            while curr < curr_max and curr < curr_last:
-                curr += 1
-            if curr < curr_last:
-                curr = prev + 1
-            lst.append(curr)
+            curr += 1
             sum_ += curr
+            lst.append(curr)
+        if sum_ > n:
+            lst.pop()
+            prev = lst.pop()
+            lst.append(n - sum_ + prev + curr)
         return lst
 
 
