@@ -12,74 +12,88 @@
 
 '''
 
-'''
-def hencode_old(st):
-    ch_sorted = freq_list(st)
-    st_code = dict()
-    ch_len = len(ch_sorted)
-    code = '0'
 
-    st_code[ch_sorted[0]] = code
-    if ch_len == 2:
-        st_code[ch_sorted[1]] = '1'
-    else:
-        for c in ch_sorted[1:-2]:
-            code = '1' + code
-            st_code[c] = code
-        st_code[ch_sorted[-2]] = code[:-1] + '10'
-        st_code[ch_sorted[-1]] = code[:-1] + '11'
-    return st_code
-'''
+def node(name, parent=None, left=None, right=None, freq=0, leaf=False):
+    return {'name': name,
+            'parent': parent,
+            'left': left,
+            'right': right,
+            'freq': freq,
+            'leaf': leaf}
 
 
-def freq_dict(st, sort=True):
-    st_freq = {c: st.count(c) for c in st}
+def sort_nodes(ns):
+    return sorted(ns, key=lambda x: x['freq'], reverse=True)
 
-    if not sort:
-        return st_freq
-    else:
-        # dict sorted by values
-        return dict(sorted(st_freq.items(),
-                           key=lambda x: x[1], reverse=True))
+
+def make_nodes(st):
+    return [node(name=c, freq=st.count(c), leaf=True) for c in set(st)]
+
+
+def tree(st):
+    nodes = make_nodes(st)
+    nodes = sort_nodes(nodes)
+    nodes_len = len(nodes)
+    nodes_done = []
+    n = None
+
+    if nodes_len == 1:
+        return nodes
+
+    while nodes_len > 1:
+        left = nodes.pop()
+        right = nodes.pop()
+        n = node(name=left['name'] + right['name'],
+                 left=left['name'],
+                 right=right['name'],
+                 freq=left['freq'] + right['freq'])
+        nodes.append(n)
+        nodes = sort_nodes(nodes)
+        nodes_len = len(nodes)
+        left['parent'] = n['name']
+        right['parent'] = n['name']
+        nodes_done.append(left)
+        nodes_done.append(right)
+    nodes_done.append(n)
+
+    return nodes_done
+
+
+def huffman_dict_new(st):
+    chars = sorted(list(set(st)))
+    nodes = tree(st)
+    nodes_dict = {n['name']: n for n in nodes}
+
+    if len(chars) == 1:
+        return {chars[0]: '0'}
+
+    ch_dict = {c: '' for c in chars}
+    for c in chars:
+        child_name = c
+        child = nodes_dict[child_name]
+        parent_name = child['parent']
+
+        while parent_name:
+            parent = nodes_dict[parent_name]
+            if child_name == parent['left']:
+                ch_dict[c] = '1' + ch_dict[c]
+            elif child_name == parent['right']:
+                ch_dict[c] = '0' + ch_dict[c]
+
+            child_name = parent_name
+            child = nodes_dict[child_name]
+            parent_name = child['parent']
+
+    return ch_dict
 
 
 def huffman_encode(st, ch_dict):
     return ''.join(ch_dict[c] for c in st)
 
 
-def huffman_dict(st):
-    ch_sort = freq_list(st)
-    ch_len = len(ch_sort)
-    ch_dict = dict()
-
-    ch_dict[ch_sort[0]] = '0'
-    if ch_len > 1:
-        for i in range(1, ch_len - 1):
-            ch_dict[ch_sort[i]] = '1' * i + '0'
-        ch_dict[ch_sort[ch_len - 1]] = '1' * (ch_len - 2) + '1'
-
-    return ch_dict
-
-
-def freq_list(st):
-    st_freq = {c: st.count(c) for c in st}
-    return tuple(dict(sorted(st_freq.items(),
-                             key=lambda x: x[1], reverse=True)).keys())
-
-
-def test_output(st):
-    h_dict = huffman_dict(st)
-
-    print(freq_dict(st))
-    print()
-    print(freq_list(st))
-    print()
-    print(h_dict)
-
 def main():
-    st = 'accepted'
-    # st = input()
-    h_dict = huffman_dict(st)
+    st = input()
+    h_dict = huffman_dict_new(st)
     st_encoded = huffman_encode(st, h_dict)
 
     print(len(h_dict), len(st_encoded), sep=' ')
@@ -89,5 +103,4 @@ def main():
 
 
 if __name__ == '__main__':
-    test_output('accepted')
-    #main()
+    main()
