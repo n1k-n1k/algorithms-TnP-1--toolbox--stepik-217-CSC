@@ -11,14 +11,25 @@
 
 
 def bin_search(num, lst):
-    # заглушка из встроенных методов для проверки корректности первых тестов грейдера
-    return -1 if num not in lst else lst.index(num) + 1
+    if lst[-1] < num < lst[0]:
+        return -1
+
+    left, right = 1, len(lst)
+
+    while left <= right:
+        mid = (right + left) // 2
+
+        if num < lst[mid - 1]:
+            right = mid - 1
+        elif num > lst[mid - 1]:
+            left = mid + 1
+        else:
+            return mid
+
+    return -1
 
 
-st1 = [int(i) for i in input().split()]
-n, list_a = st1[0], st1[1:]
-
-st2 = [int(i) for i in input().split()]
-k, list_b = st2[0], st2[1:]
+n, *list_a = [int(i) for i in input().split()]
+k, *list_b = [int(i) for i in input().split()]
 
 print(*[bin_search(list_b[i], list_a) for i in range(k)])
