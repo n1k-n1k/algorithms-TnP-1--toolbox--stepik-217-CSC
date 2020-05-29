@@ -13,54 +13,56 @@
 Для каждой точки в порядке появления во вводе выведите, скольким отрезкам она принадлежит.
 """
 
+from random import randint
+
 
 def quick_sort_mod(lst, start, end):
-    if end - start > 1:
-        pivot = partition(lst, start, end)
-        quick_sort_mod(lst, start, pivot)
-        quick_sort_mod(lst, pivot + 1, end)
-    return lst
+    while start < end:
+        i = pivot(lst, start, end)
+        lst[start], lst[i] = lst[i], lst[start]
+
+        j = partition_mod(lst, start, end)
+        quick_sort_mod(lst, start, j - 1)
+        # quick_sort_mod(lst, j + 1, end)
+        start = j + 1
 
 
-def partition(lst, start, end):
-    pivot = lst[start]
+def partition_mod(lst, start, end):
+    piv = lst[start]
     i = start + 1
-    j = end - 1
-
-    while True:
-        while i <= j and lst[i] <= pivot:
-            i = i + 1
-        while i <= j and lst[j] >= pivot:
-            j = j - 1
-
-        if i <= j:
+    for j in range(start + 1, end):
+        if lst[j] < piv:
             lst[i], lst[j] = lst[j], lst[i]
-        else:
-            lst[start], lst[j] = lst[j], lst[start]
-            return j
+            i += 1
+    lst[start], lst[i - 1] = lst[i - 1], lst[start]
+    return i - 1
+
+
+def pivot(lst, start, end):
+    # return start
+    return randint(start, end - 1)
 
 
 # testdada
 # n, m = 6, 6
 # starts = [0, 1, 2, 3, 3, 3]
-# stops = [31, 3, 3, 4, 5, 6]
+# ends = [31, 3, 3, 4, 5, 6]
 # points = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0}
-
+# result = '2 3 6 4 3 2'
 
 n, m = map(int, input().split())
-
 starts = []
-stops = []
+ends = []
 
 for _ in range(n):
-    a, b = map(int, input().split())
-    starts.append(a)
-    stops.append(b)
+    s, e = map(int, input().split())
+    starts.append(s)
+    ends.append(e)
 
 points = {int(i): 0 for i in input().split()}
 
-starts = quick_sort_mod(starts, 0, n)
-ends = quick_sort_mod(stops, 0, n)
+quick_sort_mod(starts, 0, n)
+quick_sort_mod(ends, 0, n)
 
 for p in points:
     start_cnt, end_cnt = 0, 0
